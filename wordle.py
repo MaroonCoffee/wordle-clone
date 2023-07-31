@@ -27,7 +27,30 @@ def get_feedback(guess: str, secret_word: str) -> str:
         Returns:
             str: Feedback string, based on comparing guess with the secret word
     '''
-    return ""
+    guess, secret_word = guess.lower(), secret_word.lower()
+    return_list = ["-"] * 5
+    
+    guess_letter_freq, secret_letter_freq = [0]*26, [0]*26
+    
+    for c in range(5):
+        guess_char, secret_char = guess[c], secret_word[c]
+        
+        if guess_char == secret_char:
+            return_list[c] = guess[c].upper()
+            guess_letter_freq[ord(guess_char)-ord('a')] += 1
+        secret_letter_freq[ord(secret_char)-ord('a')] += 1
+        
+    for c in range(5):
+        guess_char, secret_char = guess[c], secret_word[c]
+        if guess_char == secret_char: continue
+        char_numeric = ord(guess_char)-ord('a')
+        if secret_letter_freq[char_numeric] > guess_letter_freq[char_numeric]:
+            return_list[c] = guess_char
+            guess_letter_freq[char_numeric]+=1
+        else:
+            return_list[c] = '-'
+    
+    return return_list
 
 def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) -> str:
     '''Analyzes feedback from previous guesses (if any) to make a new guess
@@ -45,4 +68,4 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
 
 if __name__ == "__main__":
     # TODO: Write your own code to call your functions here
-    pass
+    print(get_feedback("taste", "brats"))
