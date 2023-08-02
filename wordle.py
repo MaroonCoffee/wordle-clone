@@ -70,7 +70,7 @@ def letter_printer(word, letter_state):
             case 0:
                 print(c, end="")
             case 1:
-                print(Back.BLACK + c, end="")
+                print(Back.LIGHTBLACK_EX + c, end="")
             case 2:
                 print(Back.GREEN + c, end="")
             case 3:
@@ -118,7 +118,6 @@ def game_loop(secret_word, word_list):
         print("\n" + Style.BRIGHT + Back.LIGHTBLACK_EX + "````````````")
         
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ", end="")
-        # print(repr(Style.BRIGHT + Back.LIGHTBLACK_EX + " "))
         letter_printer("QWERTYUIOP", letter_state)
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ")
 
