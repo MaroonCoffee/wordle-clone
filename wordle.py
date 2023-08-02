@@ -50,7 +50,7 @@ def get_feedback(guess: str, secret_word: str) -> str:
         else:
             return_list[c] = '-'
     
-    return return_list
+    return str().join(return_list)
 
 def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) -> str:
     '''Analyzes feedback from previous guesses (if any) to make a new guess
@@ -68,4 +68,7 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
 
 if __name__ == "__main__":
     # TODO: Write your own code to call your functions here
+    word_list = get_word_list()
+    secret_word = random.choice(word_list)
+    print(secret_word)
     print(get_feedback("taste", "brats"))
