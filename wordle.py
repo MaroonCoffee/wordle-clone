@@ -62,6 +62,15 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
         Returns:
          str: a valid guess that is exactly 5 uppercase letters
     '''
+    if guesses != []:
+        for i in range(len(guesses)):
+            new_word_set = set()
+            for word in word_list:
+                fb = get_feedback(guesses[i], word)
+                if fb == feedback[i]:
+                    new_word_set.add(word)
+            word_list = list(new_word_set)
+        
     entropy_dict = dict()
 
     for guess in word_list:
