@@ -63,12 +63,45 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
     '''
     return ""
 
-# TODO: Define and implement your own functions!
-
+def game_loop(secret_word, word_list):
+    feedback_history = []
+    game_win = False
+    for _ in range(6):
+        while True:
+            guess = input("Enter guess: ").upper()
+            if guess not in word_list:
+                print("Invalid guess!")
+            else: break
+        
+        feedback = get_feedback(guess, secret_word)
+        feedback_history.append((feedback, guess))
+        
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + "       ")
+        
+        for state, guess in feedback_history:
+            print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ", end="")
+            
+            for i, c in enumerate(state):
+                if c == '-':
+                    print(guess[i], end="")
+                elif c.isupper():
+                    print(Back.GREEN + guess[i], end="")
+                else:
+                    print(Back.YELLOW + guess[i], end="")
+                
+            print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ")
+        
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + "       ")
+        
+        if feedback == secret_word:
+            game_win = True
+            break
+    if game_win:
+        print(f"You won in {len(feedback_history)} guesses!")
+    else:
+        print(f"GAME OVER. The correct word was: {secret_word}")
 
 if __name__ == "__main__":
-    # TODO: Write your own code to call your functions here
     word_list = get_word_list()
     secret_word = random.choice(word_list)
-    print(secret_word)
-    print(get_feedback("taste", "brats"))
+    game_loop(secret_word, word_list)
