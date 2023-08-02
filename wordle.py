@@ -63,8 +63,22 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
     '''
     return ""
 
+def letter_printer(word, letter_state):
+    for c in word:
+        state = letter_state[ord(c)-ord("A")]
+        match state:
+            case 0:
+                print(c, end="")
+            case 1:
+                print(Back.BLACK + c, end="")
+            case 2:
+                print(Back.GREEN + c, end="")
+            case 3:
+                print(Back.YELLOW + c, end="")
+
 def game_loop(secret_word, word_list):
     feedback_history = []
+    letter_state = [0] * 26
     game_win = False
     for _ in range(6):
         while True:
@@ -76,22 +90,49 @@ def game_loop(secret_word, word_list):
         feedback = get_feedback(guess, secret_word)
         feedback_history.append((feedback, guess))
         
+        print("\n" + "  ", end="")
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + "       ")
         
         for state, guess in feedback_history:
+            print("  ", end="")
             print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ", end="")
             
             for i, c in enumerate(state):
                 if c == '-':
                     print(guess[i], end="")
+                    letter_state[ord(guess[i])-ord("A")] = 1
                 elif c.isupper():
                     print(Back.GREEN + guess[i], end="")
+                    letter_state[ord(guess[i])-ord("A")] = 2
                 else:
                     print(Back.YELLOW + guess[i], end="")
+                    letter_state[ord(guess[i])-ord("A")] = 3
                 
             print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ")
-        
+            
+        print("  ", end="")
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + "       ")
+        
+        # Keyboard
+        
+        print("\n" + Style.BRIGHT + Back.LIGHTBLACK_EX + "````````````")
+        
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ", end="")
+        # print(repr(Style.BRIGHT + Back.LIGHTBLACK_EX + " "))
+        letter_printer("QWERTYUIOP", letter_state)
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ")
+
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ", end="")
+        letter_printer("ASDFGHJKL", letter_state)
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + "  ")
+
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + "  ", end="")
+        letter_printer("ZXCVBNM", letter_state)
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + "   ")
+
+        print(Style.BRIGHT + Back.LIGHTBLACK_EX + "````````````")
+
+        print()
         
         if feedback == secret_word:
             game_win = True
