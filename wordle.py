@@ -2,6 +2,7 @@
 [CS2] Wordle- Guess a five-letter secret word in at most six attempts.
 '''
 import random
+import math
 # To install colorama, run the following command in your VS Code terminal:
 # py -m pip install colorama
 from colorama import Fore, Back, Style, init
@@ -61,7 +62,26 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
         Returns:
          str: a valid guess that is exactly 5 uppercase letters
     '''
-    return ""
+    entropy_dict = dict()
+
+    for guess in word_list:
+        other_words = list(word_list)
+        other_words.remove(guess)
+        probability_dict = dict()
+        
+        for other_word in other_words:
+            feedback = get_feedback(guess, other_word)
+            probability_dict.setdefault(feedback, set())
+            probability_dict[feedback].add(other_word)
+        entropy = 0
+        
+        for value in probability_dict.values():
+            p = len(value)/len(other_words)
+            entropy += p*math.log2(p**-1)
+        
+        entropy_dict[entropy] = guess
+
+    return entropy_dict[sorted(entropy_dict.keys())[-1]]
 
 def letter_printer(word, letter_state):
     for c in word:
@@ -143,5 +163,6 @@ def game_loop(secret_word, word_list):
 
 if __name__ == "__main__":
     word_list = get_word_list()
-    secret_word = random.choice(word_list)
-    game_loop(secret_word, word_list)
+    # secret_word = random.choice(word_list)
+    # game_loop(secret_word, word_list)
+    print(get_AI_guess(word_list, [], []))
