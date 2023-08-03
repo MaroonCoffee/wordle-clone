@@ -60,12 +60,13 @@ def get_AI_guess_helper(word_list: list[str], guesses: list[str], feedback: list
         return 'RAISE', -1, len(word_list), word_list
     
     if guesses != []:
-        new_word_list = list()
-        for word in word_list:
-            fb = get_feedback(guesses[-1], word)
-            if fb == feedback[-1]:
-                new_word_list.append(word)
-        word_list = new_word_list
+        for i in range(len(guesses)):
+            new_word_list = list()
+            for word in word_list:
+                fb = get_feedback(guesses[i], word)
+                if fb == feedback[i]:
+                    new_word_list.append(word)
+            word_list = new_word_list
         
     entropy_dict = dict()
 
@@ -172,47 +173,38 @@ def game_loop(secret_word, word_list):
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + "````````````")
 
         print()
-
-        print(guess, secret_word)
         
-        if guess.lower() == secret_word.lower():
+        if feedback == secret_word:
             game_win = True
             break
-
     if game_win:
         print(f"You won in {len(feedback_history)} guesses!")
     else:
         print(f"GAME OVER. The correct word was: {secret_word}")
 
+def time_test(sample_size, full_length, word_list):
+    total_time = 0
+    for word in word_list[:sample_size+1]:
+        guess_count = 0
+        guesses = []
+        feedback = []
+        start = time.perf_counter()
+        while True:
+            secret_word = word
+            guessed_word = get_AI_guess(word_list, guesses, feedback)
+            guesses.append(guessed_word)
+            feedback.append(get_feedback(guessed_word, secret_word))
+            if guessed_word == secret_word:
+                end = time.perf_counter()
+                total_time += end-start
+                break
+            guess_count += 1
+            if guess_count >= 6:
+                print("Too many guesses!")
+                break
+    print(f"Time it would take to pass full test: {full_length*total_time/sample_size}")
+
 if __name__ == "__main__":
-    global global_word_list
     word_list = get_word_list()
-    # global_word_list = word_list
-    secret_word = "kinky"
+    secret_word = random.choice(word_list)
     game_loop(secret_word, word_list)
-    # start = time.perf_counter()
-    # print(get_AI_guess(word_list, [], []))
-    # end = time.perf_counter()
-    # print(f"time: {end-start}")
-
-    # total_time = 0
-    # for word in word_list[:101]:
-    #     guess_count = 0
-    #     guesses = []
-    #     feedback = []
-    #     start = time.perf_counter()
-    #     while True:
-    #         secret_word = word
-    #         guessed_word = get_AI_guess(word_list, guesses, feedback)
-    #         guesses.append(guessed_word)
-    #         feedback.append(get_feedback(guessed_word, secret_word))
-    #         if guessed_word == secret_word:
-    #             end = time.perf_counter()
-    #             total_time += end-start
-    #             break
-    #         guess_count += 1
-    #         if guess_count >= 6:
-    #             print("too many guesses!")
-    #             break
-    # print(f"Took {total_time*160} to run!")
-
