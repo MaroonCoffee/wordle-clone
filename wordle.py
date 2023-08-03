@@ -172,10 +172,13 @@ def game_loop(secret_word, word_list):
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + "````````````")
 
         print()
+
+        print(guess, secret_word)
         
-        if feedback == secret_word:
+        if guess.lower() == secret_word.lower():
             game_win = True
             break
+
     if game_win:
         print(f"You won in {len(feedback_history)} guesses!")
     else:
@@ -185,31 +188,31 @@ if __name__ == "__main__":
     global global_word_list
     word_list = get_word_list()
     # global_word_list = word_list
-    # secret_word = random.choice(word_list)
-    # game_loop(secret_word, word_list)
+    secret_word = "kinky"
+    game_loop(secret_word, word_list)
     # start = time.perf_counter()
     # print(get_AI_guess(word_list, [], []))
     # end = time.perf_counter()
     # print(f"time: {end-start}")
 
-    total_time = 0
-    for word in word_list[:101]:
-        guess_count = 0
-        guesses = []
-        feedback = []
-        start = time.perf_counter()
-        while True:
-            secret_word = word
-            guessed_word = get_AI_guess(word_list, guesses, feedback)
-            guesses.append(guessed_word)
-            feedback.append(get_feedback(guessed_word, secret_word))
-            if guessed_word == secret_word:
-                end = time.perf_counter()
-                total_time += end-start
-                break
-            guess_count += 1
-            if guess_count >= 6:
-                print("too many guesses!")
-                break
-    print(f"Took {total_time*160} to run!")
+    # total_time = 0
+    # for word in word_list[:101]:
+    #     guess_count = 0
+    #     guesses = []
+    #     feedback = []
+    #     start = time.perf_counter()
+    #     while True:
+    #         secret_word = word
+    #         guessed_word = get_AI_guess(word_list, guesses, feedback)
+    #         guesses.append(guessed_word)
+    #         feedback.append(get_feedback(guessed_word, secret_word))
+    #         if guessed_word == secret_word:
+    #             end = time.perf_counter()
+    #             total_time += end-start
+    #             break
+    #         guess_count += 1
+    #         if guess_count >= 6:
+    #             print("too many guesses!")
+    #             break
+    # print(f"Took {total_time*160} to run!")
 
