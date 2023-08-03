@@ -3,6 +3,7 @@
 '''
 import random
 import math
+import time
 # To install colorama, run the following command in your VS Code terminal:
 # py -m pip install colorama
 from colorama import Fore, Back, Style, init
@@ -53,23 +54,18 @@ def get_feedback(guess: str, secret_word: str) -> str:
     
     return str().join(return_list)
 
-def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) -> str:
-    '''Analyzes feedback from previous guesses (if any) to make a new guess
-        Args:
-            word_list (list): A list of potential Wordle words
-            guesses (list): A list of string guesses, could be empty
-            feedback (list): A list of feedback strings, could be empty
-        Returns:
-         str: a valid guess that is exactly 5 uppercase letters
-    '''
+def get_AI_guess_helper(word_list: list[str], guesses: list[str], feedback: list[str]):
+    global global_word_list
+    if guesses == []:
+        return 'RAISE', -1, len(word_list), word_list
+    
     if guesses != []:
-        for i in range(len(guesses)):
-            new_word_set = set()
-            for word in word_list:
-                fb = get_feedback(guesses[i], word)
-                if fb == feedback[i]:
-                    new_word_set.add(word)
-            word_list = list(new_word_set)
+        new_word_list = list()
+        for word in word_list:
+            fb = get_feedback(guesses[-1], word)
+            if fb == feedback[-1]:
+                new_word_list.append(word)
+        word_list = new_word_list
         
     entropy_dict = dict()
 
@@ -89,8 +85,17 @@ def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) 
             entropy += p*math.log2(p**-1)
         
         entropy_dict[entropy] = guess
+    
+    best_entropy = sorted(entropy_dict.keys())[-1]
+    return (entropy_dict[best_entropy], best_entropy, len(word_list), word_list)
 
-    return entropy_dict[sorted(entropy_dict.keys())[-1]]
+def get_AI_guess(word_list: list[str], guesses: list[str], feedback: list[str]) -> str:
+    global global_word_list
+    if len(guesses) == 0:
+        global_word_list = word_list
+    return_values = get_AI_guess_helper(global_word_list, guesses, feedback)
+    global_word_list = return_values[3]
+    return return_values[0]
 
 def letter_printer(word, letter_state):
     for c in word:
@@ -107,9 +112,12 @@ def letter_printer(word, letter_state):
 
 def game_loop(secret_word, word_list):
     feedback_history = []
+    guess_history = []
     letter_state = [0] * 26
     game_win = False
     for _ in range(6):
+        best_guess, entropy, word_list_length, _ = get_AI_guess_helper(word_list, guess_history, feedback_history)
+        print(f"Remaining possible words: {word_list_length}, best guess: {best_guess}, predicted entropy: {round(entropy, 5)}")
         while True:
             guess = input("Enter guess: ").upper()
             if guess not in word_list:
@@ -117,12 +125,15 @@ def game_loop(secret_word, word_list):
             else: break
         
         feedback = get_feedback(guess, secret_word)
-        feedback_history.append((feedback, guess))
+        feedback_history.append(feedback)
+        guess_history.append(guess)
         
         print("\n" + "  ", end="")
         print(Style.BRIGHT + Back.LIGHTBLACK_EX + "       ")
         
-        for state, guess in feedback_history:
+        for i in range(len(feedback_history)):
+            state = feedback_history[i]
+            guess = guess_history[i]
             print("  ", end="")
             print(Style.BRIGHT + Back.LIGHTBLACK_EX + " ", end="")
             
@@ -171,7 +182,34 @@ def game_loop(secret_word, word_list):
         print(f"GAME OVER. The correct word was: {secret_word}")
 
 if __name__ == "__main__":
+    global global_word_list
     word_list = get_word_list()
+    # global_word_list = word_list
     # secret_word = random.choice(word_list)
     # game_loop(secret_word, word_list)
-    print(get_AI_guess(word_list, [], []))
+    # start = time.perf_counter()
+    # print(get_AI_guess(word_list, [], []))
+    # end = time.perf_counter()
+    # print(f"time: {end-start}")
+
+    total_time = 0
+    for word in word_list[:101]:
+        guess_count = 0
+        guesses = []
+        feedback = []
+        start = time.perf_counter()
+        while True:
+            secret_word = word
+            guessed_word = get_AI_guess(word_list, guesses, feedback)
+            guesses.append(guessed_word)
+            feedback.append(get_feedback(guessed_word, secret_word))
+            if guessed_word == secret_word:
+                end = time.perf_counter()
+                total_time += end-start
+                break
+            guess_count += 1
+            if guess_count >= 6:
+                print("too many guesses!")
+                break
+    print(f"Took {total_time*160} to run!")
+
